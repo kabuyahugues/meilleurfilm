@@ -5,12 +5,25 @@ class ApiConnect {
         this.url = url;
         this.key = key;
         this.category = category;
+        // this.id = id
     }
 
     async connection(){
         try {
             const reponse = await fetch(`https://${this.url}${this.category}?api_key=${this.key}`)
             const data = await reponse.json();
+            return data;
+        } catch (error) {
+            console.log(error);
+            return;
+        }
+    }
+
+    async lienSinglePage(id){
+        try {
+            const reponse = await fetch(`https://${this.url}${id}?api_key=${this.key}`)
+            const data = await reponse.json();
+            console.log(data);
             return data;
         } catch (error) {
             console.log(error);
@@ -57,13 +70,14 @@ async function defaultDisplay() {
       // div //
       let divShow = document.createElement('div');
       let h2 = document.createElement('h2');
-      let divShowImg = document.createElement('div');
+      let divShowImg = document.createElement('a');
       let img = document.createElement('img');
       let divNote = document.createElement('note');
 
       // class //
       divShow.classList.add('tv-show');
       divShowImg.classList.add('tv-show__img');
+      divShowImg.href = `detail.html?id=${element.id}`
       divNote.classList.add('note');
 
       // insert //
@@ -85,10 +99,29 @@ function displayfilter(idx) {
   defaultDisplay();
 }
 
+async function displayShowDetails() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  let data = await lien.lienSinglePage(id)  
+  
+  let h3 = document.querySelector('.single_titlte')
+  let p = document.querySelector('.text')
+  let img = document.querySelector('.imgaSingle')
+
+  console.log(data.name);
+  
+  h3.textContent = `${data.name}`;
+  p.textContent = data.overview;
+  img.src = `https://image.tmdb.org/t/p/w500/${data.poster_path}`;
+
+
+}
+
 
 ///// event ///////
 
-btn.addEventListener('click', (e) =>{
+if (btn) {
+  btn.addEventListener('click', (e) =>{
   if (e.target.classList.contains('btn')) {
     let btn = e.target.closest('.btn')
     let index = btn.getAttribute('data-tv')
@@ -97,8 +130,10 @@ btn.addEventListener('click', (e) =>{
       displayfilter(index);
     }
   }
-})
+  })
+}
 
 //// function ////
 
 defaultDisplay();
+displayShowDetails();
