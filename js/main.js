@@ -1,16 +1,16 @@
 ////// classs //////
 
 class ApiConnect {
-    constructor(url, key, category) {
+    constructor(url, key, category, number) {
         this.url = url;
         this.key = key;
         this.category = category;
-        // this.id = id
+        this.number = number
     }
 
     async connection(){
         try {
-            const reponse = await fetch(`https://${this.url}${this.category}?api_key=${this.key}`)
+            const reponse = await fetch(`https://${this.url}${this.category}?page=${this.number}&api_key=${this.key}`)
             const data = await reponse.json();
             return data;
         } catch (error) {
@@ -46,17 +46,25 @@ class ApiConnect {
     setCategory(newCategory) {
         this.category = newCategory;
     } 
+
+    setPage(newpage) {
+        this.number = newpage;
+    } 
 }
 
 ///// variable ///////
 
-let category = 'airing_today';
+let category = 'top_rated';
 
-let lien = new ApiConnect('api.themoviedb.org/3/tv/','6631e5f1dc96088e0d26b86da29b5b6a',category);
+let number = 1;
+
+let lien = new ApiConnect('api.themoviedb.org/3/tv/','6631e5f1dc96088e0d26b86da29b5b6a',category, number);
 
 let divWapper = document.querySelector('.wrapper');
 
 let btn = document.querySelector('.buttons');
+let btnNext = document.querySelector('.next')
+let btnPre = document.querySelector('.pre')
 
 ////// function ///////
 
@@ -91,6 +99,20 @@ async function defaultDisplay() {
       divWapper.appendChild(divShow);
     }
 
+    if (btnPre && btnNext) {
+      btnNext.addEventListener('click', (e) =>{
+        number ++
+        lien.setPage(number);
+        defaultDisplay();
+      });
+      btnPre.addEventListener('click', () => {
+          if (number > 1) {
+            number--;
+            lien.setPage(number);
+            defaultDisplay();
+          }
+      });
+    }
   }
 };
 
@@ -123,7 +145,10 @@ async function displayShowDetails() {
 if (btn) {
   btn.addEventListener('click', (e) =>{
   if (e.target.classList.contains('btn')) {
+    let btnall = document.querySelectorAll('.btn')
+    btnall.forEach(b => b.classList.remove('active'));
     let btn = e.target.closest('.btn')
+    btn.classList.add('active')
     let index = btn.getAttribute('data-tv')
     console.log(`le resultat de l'index est ${index}`);
     if (index) {
