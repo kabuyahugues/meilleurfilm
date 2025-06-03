@@ -91,14 +91,24 @@ h2 {
 .main_single{
   padding: 4%;
   height: 100vh;
+  a{
+    margin-left: 30%;
+  }
 }
 .popup{
   display: flex;
   height: 100%;
   .popup__img{
-    margin-right: 2%;
+    width: 35%;
     img{
       border-radius: 10px;
+      height: 100%;
+      width: 90%;
+      object-fit: cover;
     }
+  }
+  .popup__txt{
+    width: 65%;
+    padding-left: 2%;
   }
 }
