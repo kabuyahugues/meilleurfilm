@@ -1,11 +1,12 @@
 ////// classs //////
 
 class ApiConnect {
-    constructor(url, key, category, number) {
+    constructor(url, key, category, favoris) {
         this.url = url;
         this.key = key;
         this.category = category;
-        this.number = number
+        this.number = 1;
+        this.favoris = favoris
     }
 
     async connection(){
@@ -23,7 +24,7 @@ class ApiConnect {
         try {
             const reponse = await fetch(`https://${this.url}${id}?api_key=${this.key}`)
             const data = await reponse.json();
-            console.log(data);
+            // console.log(data);
             return data;
         } catch (error) {
             console.log(error);
@@ -34,7 +35,7 @@ class ApiConnect {
     async getData(){
         const lien = await this.connection();
         const data = await lien.results;
-        console.log(data);
+        // console.log(data);
         if (data) {
           return data;
         }else{
@@ -47,8 +48,11 @@ class ApiConnect {
         this.category = newCategory;
     } 
 
-    setPage(newpage) {
-        this.number = newpage;
+    setPage(newPage) {
+        this.number = newPage;
+    }
+    setFavori(newFavoris){
+      this.favoris = newFavoris
     } 
 }
 
@@ -58,13 +62,17 @@ let category = 'top_rated';
 
 let number = 1;
 
+let arrayFilm = [];
+
 let lien = new ApiConnect('api.themoviedb.org/3/tv/','6631e5f1dc96088e0d26b86da29b5b6a',category, number);
 
 let divWapper = document.querySelector('.wrapper');
 
 let btn = document.querySelector('.buttons');
-let btnNext = document.querySelector('.next')
-let btnPre = document.querySelector('.pre')
+let btnNext = document.querySelector('.next');
+let btnPre = document.querySelector('.pre');
+
+let btnFavoris = document.querySelector('.favoris')
 
 ////// function ///////
 
@@ -74,19 +82,20 @@ async function defaultDisplay() {
     divWapper.innerHTML =  '';
 
     for (const element of data) {
-      console.log(element);
       // div //
       let divShow = document.createElement('div');
       let h2 = document.createElement('h2');
       let divShowImg = document.createElement('a');
       let img = document.createElement('img');
       let divNote = document.createElement('note');
+      let divcheck = document.createElement('div');
 
       // class //
       divShow.classList.add('tv-show');
       divShowImg.classList.add('tv-show__img');
       divShowImg.href = `detail.html?id=${element.id}`
       divNote.classList.add('note');
+      divcheck.classList.add('check');
 
       // insert //
       h2.textContent = element.name;
@@ -94,13 +103,31 @@ async function defaultDisplay() {
       divNote.textContent = `${element.vote_average}/10`
 
       // append //
-      divShow.append(h2, divShowImg);
+      divShow.append(h2, divShowImg, divcheck);
       divShowImg.append(img, divNote);
       divWapper.appendChild(divShow);
+
+      if (divcheck) {
+        divcheck.addEventListener('click', (e) => {
+          arrayFilm.push(element);
+          localStorage.setItem("favoritFilm", JSON.stringify(arrayFilm));
+          let favoris = localStorage.getItem("favoritFilm");
+          let json = JSON.parse(favoris);
+          console.log(json);
+          
+          lien.setFavori(json);
+        })
+      }
     }
 
-    if (btnPre && btnNext) {
+  }
+};
+
+function pagination() {
+   if (btnPre && btnNext) {
       btnNext.addEventListener('click', (e) =>{
+        console.log(lien);
+        
         number ++
         lien.setPage(number);
         defaultDisplay();
@@ -113,8 +140,7 @@ async function defaultDisplay() {
           }
       });
     }
-  }
-};
+}
 
 function displayfilter(idx) {
   lien.setCategory(idx);
@@ -130,13 +156,16 @@ async function displayShowDetails() {
   let p = document.querySelector('.text')
   let img = document.querySelector('.imgaSingle')
 
-  console.log(data.name);
   
-  h3.textContent = `${data.name}`;
+  h3.textContent = data.name;
   p.textContent = data.overview;
   img.src = `https://image.tmdb.org/t/p/w500/${data.poster_path}`;
+}
 
-
+function favoris() {
+  console.log(lien.setFavori());
+  
+  
 }
 
 
@@ -158,7 +187,14 @@ if (btn) {
   })
 }
 
+if (btnFavoris) {
+  btnFavoris.addEventListener('click', (e) =>{
+    favoris();
+  })
+}
+
 //// function ////
 
 defaultDisplay();
 displayShowDetails();
+pagination();

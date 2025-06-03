@@ -54,6 +54,7 @@ h2 {
   font-size: 16px;
 }
 .tv-show {
+  position: relative;
   cursor:pointer;
   padding:10px;
   overflow: hidden;
@@ -122,4 +123,15 @@ h2 {
   margin: 4rem auto;
   width: 20%;
   text-align: center;
+}
+
+.check{
+ position: absolute;
+ width: 4%;
+ height: 3%;
+ background-color: white;
+ border: 1px solid black;
+ top: 6%;
+ right: 0;
+ z-index: 1001;
 }
