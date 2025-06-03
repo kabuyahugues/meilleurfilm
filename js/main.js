@@ -53,7 +53,10 @@ class ApiConnect {
     }
     setFavori(newFavoris){
       this.favoris = newFavoris
-    } 
+    }
+    getFavori(){
+
+    }
 }
 
 ///// variable ///////
@@ -109,6 +112,7 @@ async function defaultDisplay() {
 
       if (divcheck) {
         divcheck.addEventListener('click', (e) => {
+          divcheck.classList.add('bleu');
           arrayFilm.push(element);
           localStorage.setItem("favoritFilm", JSON.stringify(arrayFilm));
           let favoris = localStorage.getItem("favoritFilm");
@@ -163,8 +167,39 @@ async function displayShowDetails() {
 }
 
 function favoris() {
-  console.log(lien.setFavori());
   
+  const favoris = localStorage.getItem("favoritFilm");
+  if (favoris) {
+    const json = JSON.parse(favoris);
+    lien.setFavori(json);
+    divWapper.innerHTML =  '';
+
+    for (const element of json) {
+      // div //
+      let divShow = document.createElement('div');
+      let h2 = document.createElement('h2');
+      let divShowImg = document.createElement('a');
+      let img = document.createElement('img');
+      let divNote = document.createElement('note');
+      let divcheck = document.createElement('div');
+
+      // class //
+      divShow.classList.add('tv-show');
+      divShowImg.classList.add('tv-show__img');
+      divShowImg.href = `detail.html?id=${element.id}`
+      divNote.classList.add('note');
+
+      // insert //
+      h2.textContent = element.name;
+      img.src = `https://image.tmdb.org/t/p/w500/${element.poster_path}`;
+      divNote.textContent = `${element.vote_average}/10`
+
+      // append //
+      divShow.append(h2, divShowImg);
+      divShowImg.append(img, divNote);
+      divWapper.appendChild(divShow);
+    }
+  }
   
 }
 
@@ -189,7 +224,7 @@ if (btn) {
 
 if (btnFavoris) {
   btnFavoris.addEventListener('click', (e) =>{
-    favoris();
+  favoris();
   })
 }
 
